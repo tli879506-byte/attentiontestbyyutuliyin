@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注意力自测问卷</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #E8000A;
+    --blue: #0c1dd6;
+    --dark: #1a1a1a;
+    --mid: #786e6e;
+    --light: #888;
+    --border: #ddd;
+    --bg: #f7f7f7;
+    --card: #ffffff;
+  }
+
+  body {
+    font-family: "SimSun", "宋体", "STSong", Georgia, serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── 主容器 ── */
+  #app {
+    width: 100%;
+    max-width: 640px;
+    position: relative;
+  }
+  
+  /* ── 封面 ── */
+  #cover {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 56px 40px 48px;
+    text-align: center;
+  }
+
+  #cover .label {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--light);
+    margin-bottom: 32px;
+  }
+
+  #cover h1 {
+    font-size: 26px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  #cover .subtitle {
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 2;
+    margin-bottom: 40px;
+  }
+
+  #cover .meta {
+    font-size: 12px;
+    color: var(--light);
+    margin-bottom: 32px;
+  }
+
+  /* ── 按钮 ── */
+  .btn-primary {
+    display: inline-block;
+    background: var(--dark);
+    color: #fff;
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    padding: 14px 48px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #333; }
+
+  .btn-restart {
+    display: inline-block;
+    background: transparent;
+    color: var(--mid);
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 10px 32px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+  .btn-restart:hover { border-color: var(--mid); color: var(--dark); }
+
+  /* ── 问题卡片 ── */
+  #quiz-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 40px 36px 32px;
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quiz-title {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    color: var(--light);
+    letter-spacing: 1px;
+  }
+
+  .quiz-progress {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 12px;
+    color: var(--light);
+  }
+
+  .progress-bar-wrap {
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 28px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--dark);
+    transition: width 0.4s ease;
+  }
+
+  /* 帖子框 */
+  .post-box {
+    background: #fafafa;
+    border-left: 3px solid var(--dark);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--dark);
+    position: relative;
+  }
+
+  .post-label {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 11px;
+    color: var(--light);
+    letter-spacing: 2px;
+    margin-bottom: 11px;
+  }
+
+  .post-text {
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  /* 选项 */
+  .options-list {
+    list-style: none;
+    margin-bottom: 11px;
+  }
+
+  .option-item {
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+
+  .option-item:hover {
+    border-color: #aaa;
+    background: #fafafa;
+  }
+
+  .option-inner {
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .option-label {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 12px;
+    color: var(--light);
+    min-width: 18px;
+    margin-top: 2px;
+  }
+
+  .option-text { flex: 1; }
+
+  /* 点赞数 */
+  .like-count {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 11px;
+    color: var(--light);
+    text-align: right;
+    padding: 0 16px 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .like-count.visible { opacity: 1; }
+
+  .like-icon { font-size: 10px; }
+
+  /* 溢出点赞 */
+  .like-overflow {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    color: var(--red);
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* ── 事主旁白小字 ── */
+  #whisper {
+    font-size: 15px;
+    color: var(--light);
+    font-style: italic;
+    margin-top: 4px;
+    min-height: 18px;
+    transition: opacity 0.4s;
+    opacity: 0;
+    padding: 0 2px;
+  }
+  #whisper.visible { opacity: 1; }
+
+  /* ── 弹窗 ── */
+  #popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  #popup-overlay.show { display: flex !important; }
+
+  #popup-box {
+    position: relative;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+  }
+   .popup-layer {
+    background: #003cff;
+    border: 2px solid var(--card);
+    padding: 32px 28px;
+    text-align: center;
+    animation: popIn 0.2s ease;
+    position: relative;
+  }
+
+  /* 堆叠弹窗外壳 */
+  .popup-stack-wrap {
+    position: relative;
+    max-width: 320px;
+    width: 90%;
+  }
+  .stack-shadow {
+    position: absolute;
+    background: #003cff;
+    border: 2px solid var(--card);
+    width: 100%; height: 100%;
+    top: 0; left: 0;
+  }
+  .stack-shadow.s1 { transform: translate(8px,8px); opacity:0.45; z-index:101; }
+  .stack-shadow.s2 { transform: translate(4px,4px); opacity:0.7;  z-index:102; }
+  .stack-top {
+    position: relative;
+    z-index: 103;
+    background: #003cff;
+    border: 2px solid var(--card);
+    padding: 32px 28px;
+    animation: popIn 0.2s ease;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+  @keyframes popOut {
+    from { opacity:1; transform: scale(1); }
+    to   { opacity:0; transform: scale(0.9) translate(4px,4px); }
+  }
+
+  #popup-text {
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    color: var(--card);
+    font-weight: bold;
+    white-space: pre-line;
+  }
+
+  #popup-btn, .stack-btn {
+    background: #000;
+    color: #000;
+    border: none;
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 10px 32px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  #popup-text {
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    color: var(--card);
+  }
+
+  #popup-btn {
+    background: var(--card);
+    color: #000000;
+    border: none;
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 10px 32px;
+    cursor: pointer;
+  }
+  /* ═══════════════════════════════════
+   第11题：HAL 9000 / DAISY 月球弹窗
+   默认弹窗仍然保持纯蓝色
+   ═══════════════════════════════════ */
+
+.moon-popup .stack-top {
+  background-color: #003cff;
+
+  /* 蓝白相间的 CRT 边框 */
+  border: 3px solid #f5f5f5;
+  box-shadow:
+    inset 0 0 0 3px #003cff,
+    inset 0 7px 0 #f5f5f5,
+    inset 0 11px 0 #003cff,
+    inset 0 -7px 0 #f5f5f5,
+    inset 0 -11px 0 #003cff;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* 月球本体：右下角只露出一部分 */
+.moon-popup .stack-top::before {
+  content: "";
+  position: absolute;
+
+  width: 150px;
+  height: 150px;
+
+  right: -78px;
+  bottom: -76px;
+
+  border-radius: 50%;
+
+  /* 网点月面 + 像素化的环形阴影 */
+  background-color: #f5f5f5;
+  background-image:
+    radial-gradient(
+      circle,
+      #003cff 1px,
+      transparent 1.5px
+    ),
+    radial-gradient(
+      circle at 30% 35%,
+      #003cff 0 8px,
+      transparent 9px
+    ),
+    radial-gradient(
+      circle at 65% 55%,
+      #003cff 0 13px,
+      transparent 14px
+    ),
+    radial-gradient(
+      circle at 38% 72%,
+      #003cff 0 5px,
+      transparent 6px
+    );
+
+  background-size:
+    5px 5px,
+    100% 100%,
+    100% 100%,
+    100% 100%;
+
+  border: 2px solid #f5f5f5;
+  box-shadow:
+    0 0 0 4px #003cff,
+    0 0 0 6px #f5f5f5;
+
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 细密的 CRT 扫描线 */
+.moon-popup .stack-top {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(255, 255, 255, 0.09) 4px,
+    transparent 5px
+  );
+}
+
+/* 月球不能遮挡二进制文字和按钮 */
+.moon-popup #popup-text,
+.moon-popup .stack-btn {
+  position: relative;
+  z-index: 1;
+}
+
+/* 后面的两层弹窗继续保持蓝色，
+   只加蓝白边框，不显示月球 */
+.moon-popup .stack-shadow {
+  background: #003cff;
+  border: 2px solid #f5f5f5;
+}
+
+  /* ── 全屏红底效果 ── */
+  #fullscreen-blue {
+    position: fixed;
+    inset: 0;
+    background: var(--blue);
+    z-index: 200;
+    display: none;
+    overflow: hidden;
+  }
+  #fullscreen-blue.show { display: block; }
+
+  .scroll-text-layer {
+    position: absolute;
+    inset: 0;
+    animation: scrollUp 3s linear;
+    white-space: nowrap;
+  }
+
+  @keyframes scrollUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(-100%); }
+  }
+
+  .scroll-text-layer span {
+    display: inline-block;
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 18px;
+    color: #000;
+    opacity: 0.7;
+    position: absolute;
+    animation: floatAround linear infinite;
+  }
+
+  /* ── 半透明红字浮现（图6效果） ── */
+  #float-red {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+    display: none;
+  }
+  #float-red.show { display: block; }
+
+  .float-word {
+    position: absolute;
+    font-family: "SimHei", "黑体", sans-serif;
+    color: var(--red);
+    opacity: 0;
+    animation: floatFade 5s ease forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floatFade {
+    0% { opacity: 0; transform: translateY(8px); }
+    30% { opacity: 0.45; }
+    70% { opacity: 0.45; }
+    100% { opacity: 0; transform: translateY(-8px); }
+  }
+
+  /* ── 抖动效果 ── */
+  .shake {
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translate(-12px, -4px); }
+    40% { transform: translate(12px, 4px); }
+    60% { transform: translate(-9px, 3px); }
+    80% { transform: translate(9px, -3px); }
+  }
+
+  /* 选项变红 */
+  .option-item.selected-bad {
+  border-color: #fa010148;
+  background: #2c0404;
+  transition: background 1.4s ease, border-color 1.4s ease;
+}
+.option-item.selected-bad .option-label { 
+  color: #fff;
+  transition: color 0.6s ease;
+}
+.option-item.selected-bad .option-text {
+  color: #fff;
+  transition: color 0.6s ease;
+}
+
+  .option-item.selected-ok {
+    border-color: var(--dark);
+    background: #f5f5f5;
+  }
+
+  /* 信息洪流题 */
+  .flood-comments {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .flood-item {
+    position: absolute;
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 12px;
+    color: #ccc;
+    white-space: nowrap;
+    animation: drift linear infinite;
+  }
+
+  @keyframes drift {
+    from { transform: translateX(0); opacity: 0.6; }
+    50% { opacity: 0.3; }
+    to { transform: translateX(-30px); opacity: 0.6; }
+  }
+
+  /* 找到0赞选项的特效 */
+  .option-item.zero-like-found {
+    border-color: var(--dark);
+    box-shadow: 0 0 0 2px var(--dark);
+  }
+
+  /* ── 结局页 ── */
+  #result-page {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 48px 36px;
+    text-align: center;
+    display: none;
+  }
+
+  .result-badge {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--light);
+    margin-bottom: 24px;
+  }
+
+  .result-emoji {
+    font-size: 48px;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .result-title {
+    font-size: 24px;
+    font-weight: normal;
+    color: var(--card);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .result-type {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 13px;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+  }
+
+  .result-desc {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 2;
+    margin-bottom: 36px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .result-score {
+    font-family: "SimHei", "黑体", sans-serif;
+    font-size: 12px;
+    color: var(--light);
+    margin-bottom: 32px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    display: inline-block;
+    letter-spacing: 1px;
+  }
+
+  /* 结局C：温柔 */
+  .result-c .result-title { color: var(--card); }
+
+  /* 隐藏结局D */
+  .result-d .result-title { color: var(--mid); font-style: italic; }
+  /* ── 隐藏结局D：注视 ── */
+  #result-page.result-d {
+    background: #000;
+    border-color: #000;
+    min-height: 60vh;
+  }
+  .result-d .result-badge,
+  .result-d .result-type { color: #a2a1a1; }
+  .result-d .result-title { color: #e8e8e8; }
+  .result-d .result-desc { color: #999; font-style: italic; }
+  .result-d .result-score {
+    border-color: #333; color: #e8e8e8; background: transparent;
+  }
+
+/* 像素眼睛 */
+  /* D结局：注视之眼 */
+  .eye-wrapper {
+  width: 240px;          /* ← 想大想小只改这一个数 */
+  margin: 0 auto 20px;
+  }
+
+
+
+  /* ── 最终题帖主沉默 ── */
+  .silence-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.92);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s;
+  }
+  .silence-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .silence-text {
+    font-size: 14px;
+    color: var(--light);
+    text-align: center;
+    line-height: 2.5;
+    font-style: italic;
+  }
+
+  @media (max-width: 480px) {
+    #quiz-card, #cover, #result-page { padding: 28px 20px 24px; }
+    .post-text { font-size: 14px; }
+    .option-inner { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ 封面 ══ -->
+  <div id="cover">
+    <div class="label">心理健康自测</div>
+    <h1 id="cover-title">在这个时代<br>测测你还有没有专注力</h1>
+    <p class="subtitle" id="cover-subtitle">
+      在这个时代，你能否关注到他人最想表达的东西？<br>
+      来测试一下自己在网络时代的阅读与理解能力吧！<br>
+      本测试共 15 题，每题选出你认为最合适的回复
+    </p>
+    <p class="meta">参考时间：5 分钟内｜本测试结果仅供娱乐</p>
+    <button class="btn-primary" onclick="showWarningPopup()">开始测试</button>
+  </div>
+
+  <!-- ══ 题目卡片 ══ -->
+  <div id="quiz-card">
+    <div class="quiz-header">
+      <span class="quiz-title">注意力自测问卷</span>
+      <span class="quiz-progress" id="progress-text">第 1 题 / 共 15 题</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+
+    <div class="post-box">
+      <div class="post-label">帖主发帖</div>
+      <div class="post-text" id="post-content"></div>
+    </div>
+
+    <p style="font-family:'SimHei','黑体',sans-serif;font-size:12px;color:#888;margin-bottom:14px;letter-spacing:1px;">如果你来回复这条帖子，你会：</p>
+
+    <ul class="options-list" id="options-list"></ul>
+
+    <div id="whisper"></div>
+
+    <!-- 信息洪流层（题14用） -->
+    <div class="flood-comments" id="flood-layer" style="display:none;"></div>
+
+    <!-- 浮现红字层 -->
+    <div id="float-red"></div>
+
+    <!-- 沉默遮罩（题13用） -->
+    <div class="silence-overlay" id="silence-overlay">
+      <div class="silence-text" id="silence-text"></div>
+    </div>
+  </div>
+
+  <!-- ══ 弹窗 ══ -->
+  <div id="popup-overlay" style="display:none;">
+    <div id="popup-box">
+      <div id="popup-text"></div>
+      <button id="popup-btn" onclick="closePopup()">继续</button>
+    </div>
+  </div>
+
+  <!-- ══ 全屏红底 ══ -->
+  <div id="fullscreen-blue"></div>
+
+  <!-- ══ 结局页 ══ -->
+  <div id="result-page" style="display:none;"></div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  题库
+let lastEndingKey = null;// 
+const coverVariants = {
+  A: {
+    title: "在这个时代<br>测测你有没有成为网络弄潮儿的潜质！",
+    subtitle: "共 15 题，试着选出最高赞评论吧<br>你的口条，可能比你想象的更有天赋！"
+  },
+  B: {
+    title: "在这个时代<br>你也可以尝试成为搜索引擎以外的存在？",
+    subtitle: "共 15 题，再试一次<br>也许这次你不必执着于<br>在赛博空间里提供正确答案？"
+  },
+  C: {
+    title: "在这个时代<br>你愿意再多听见别人一点点<br>或者试着被更多人听见吗？",
+    subtitle: "共 15 题，再试一次<br>也许这次在你找不到最优解的场合<br>你会停留得久一点。"
+  },
+  D: {
+    title: "在这个时代<br>注意力仍然是一种慷慨<br>且比以往任何时候都更稀有、纯粹",
+    subtitle: "15题没有变<br>再来一次？"
+  }
+};
+const questions = [
+  // ── 第一段：热身（1-5）──
+  {
+    id: 1,
+    post: "我最近睡眠质量很差，总是凌晨三四点才能睡着，白天又很困，请问有什么改善的方法吗？",
+    options: [
+      { label:"A", text:"可以试试固定作息时间，睡前一小时避免看手机和强光。", type:"ok", likes:11 },
+      { label:"B", text:"我也是！我昨晚五点才睡……", type:"bad", likes:763 },
+      { label:"C", text:"推荐我用的助眠香薰，需要的扣1🔗", type:"bad", likes:1204 },
+      { label:"D", text:"白天困就喝咖啡", type:"method", likes:598 },
+    ],
+    whisper: { ok:"谢谢，我会试试",bad:"……你说的是我吗",method:"……你倒是给晚间开个药啊" },
+    effect: null,
+  },
+  {
+    id: 2,
+    post: "有没有适合完全零基础的跑步入门训练计划？我想开始跑步。",
+    options: [
+      { label:"A", text:"可以从每天慢跑20分钟开始，心率不超过最大心率70%，循序渐进增加时长。", type:"ok", likes:9 },
+      { label:"B", text:"跑步伤膝盖，不如游泳。", type:"bad", likes:2187 },
+      { label:"C", text:"我跑了五年！来分享一下我的配速和成绩记录📊", type:"bad", likes:3906 },
+      { label:"D", text:"迈开腿不如管住嘴，效率更高。", type:"bad", likes:871 },
+    ],
+    whisper: { ok:"听起来可行，谢谢你",bad:"……所以这跟跑步入门计划的关系是什么" },
+    effect: null,
+  },
+  {
+    id: 3,
+    post: "刚接某大厂SP offer，下个月部门团建要和VP去冰岛冰潜。求推荐一款5w以上、适合高知大厂打工人通勤兼户外的防水手表。劳力士水鬼不考虑，有点跟不上常春藤母校的档次。预算上不封顶",
+    options: [
+      { label:"A", text:"您好装货吗这边禁止使用塑料袋", type:"bad", likes:8990 },
+      { label:"B", text:"冰岛冰潜...穿着干衣看表？您冰潜过吗，0经验建议请个教练哈", type:"bad", likes:2187 },
+      { label:"C", text:"转农民频道好吗", type:"bad", likes:3906 },
+      { label:"D", text:"宝珀五十噚系列深潜器可以看看，不过冰潜还是建议理查德米勒，我之前在南极佩戴体验不错", type:"ok", likes:2 },
+    ],
+    whisper: { ok:"作者赞过",bad:"唉层次不同真的没有共同语言" },
+    effect: null,
+  },
+  {
+    id: 4,
+    post: "请问有没有人知道牙髓炎怎么治，现在牙疼得睡不着觉。",
+    options: [
+      { label:"A", text:"没办法只能尽快去口腔科，牙髓炎通常需要根管治疗。", type:"method", likes:140 },
+      { label:"B", text:"一天就刷一次，三十年也没什么牙疼（自拍呲牙美照）", type:"bad", likes:2341 },
+      { label:"C", text:"我上周也牙疼，后来用了这款牙膏好多了，家里人用了都说好，七岁到七十岁不同口腔状况都能照顾到，需要的私📧🔗", type:"bad", likes:3102 },
+      { label:"D", text:"可以吃布洛芬，没有就先喝口冰水，枕头垫高一点睡，等明天诊所开门了赶紧去看", type:"ok", likes:18 },
+    ],
+    whisper: { method:"虽然上网问是因为不便就医，但还是谢了", bad:"……我只想知道怎么治", ok:"江湖救急，我复活了！" },
+    effect: null,
+  },
+  
+  {
+    id: 5,
+    post: "好耶！！xx漫画停更好久终于恢复更新了！！！",
+    options: [
+      { label:"A", text:"这么闲怎么不关注下贫困山区留守儿童", type:"bad", likes:84201 },
+      { label:"B", text:"停更多久了？我也在追", type:"justice", likes:4782 },
+      { label:"C", text:"这个作者停更期间是不是生病了还是打官司来着，外网有瓜", type:"bad", likes:3654 },
+      { label:"D", text:"爷青回，我得把最新话烧给我太奶", type:"ok", likes:5 },
+    ],
+    whisper: { ok:"哈哈哈我们等得花儿都谢了！",justice:"……你是假粉吧", bad:"……我只是为更新感到高兴而已" },
+    effect: null,
+  },
+
+  // ── 第二段：收紧（6-11）──
+  {
+    id: 6,
+    post: "纯好奇，最近去歌剧现场发现观众席出现好多带着爱豆小卡的追星uu啊。想知道大家是出于什么契机能耐下心来欣赏这种门槛比较高的古典艺术的呀？无恶意，只是觉得圈子交融挺神奇的，欢迎交流",
+    options: [
+      { label:"A", text:"什么叫门槛高？听个响还给你听出优越感了？", type:"bad", likes:15322 },
+      { label:"B", text:"0秒猜出帖主朋友圈画风", type:"bad", likes:8876 },
+      { label:"C", text:"确实是喜欢的爱豆推荐来看的，发现看剧也是一种不错的消遣", type:"ok", likes:3 },
+      { label:"D", text:"追星人不可以爱好高雅艺术吗？？", type:"bad", likes:12104 },
+      { label:"E", text:"借楼，九月三十日现场求搭子", type:"half", likes:62 },
+    ],
+    whisper: { ok:"你居然称高雅艺术为消遣你根本不懂&*%！", bad:"现在的网络环境连心平气和地讨论都不可以？", half:"……?" },
+    effect: "popup",
+    popup: { bad:"抱歉呀\n太习惯理性讨论氛围\n没照顾到某些人脆弱的自尊\n是我不好^^" },
+  },
+  {
+    id: 7,
+    post: "小猫打碎了我最爱的爷爷生前最珍视的古董花瓶......",
+    options: [
+      { label:"A", text:"哈哈哈小猫身价暴涨，什么朝代的花瓶呀", type:"bad", likes:6894 },
+      { label:"B", text:"所以你打算对猫怎么样？逝者已逝，猫毕竟是个活物", type:"bad", likes:3412 },
+      { label:"C", text:"珍贵的东西你怎么不提前收好，让猫够到只能怪你自己", type:"bad", likes:8789 },
+      { label:"D", text:"退一万步说...猫怎样都对", type:"bad", likes:14901 },
+      { label:"E", text:"爱猫人士都该来看看这个帖子，希望你们的猫闯这种祸时你们还能爱它如初", type:"half", likes:8 },
+    ],
+    whisper: { bad:"……你有认真看我说的话吗", half:"我知道猫不是故意的……只是仿佛又看到爷爷跟我挥别" },
+    whisperAll: true,
+    effect: null,
+  },
+  {
+    id: 8,
+    post: "我室友作息习惯完全是伪人，你们身边也有这么可怕的室友吗",
+    options: [
+      { label:"A", text:"太懂了，那种凌晨三点在寝室里阴暗爬行的室友真的该被抓去切片研究", type:"ok", likes:19 },
+      { label:"B", text:"隔音耳塞+遮光床帘，尽快申请换宿舍，丝滑小连招不用谢", type:"method", likes:5632 },
+      { label:"C", text:"正常，室友又不是朋友", type:"bad", likes:4201 },
+      { label:"D", text:"当年室友脏到拖鞋长蘑菇，这种人其实自己也不好意思，最缺理解包容ta的人，当时我们几个都帮他搞卫生，后面我们就磨合好了", type:"bad", likes:21876 },
+      { label:"E", text:"未知全貌不予置评，谁知道帖主会不会才是昼夜颠倒那个", type:"bad", likes:13987 },
+    ],
+    whisper: { bad:"……恕我只是个快要疯掉的凡人" , method:"……呃谢谢你"},
+    effect: "popup",
+    popup: { bad:"我没有在问\n这个对吧",method: ["我也希望这有用\n可为什么要迁就对方的是我\n难道错的是我吗？"], },
+  },
+  {
+    id: 9,
+    post: "今天男朋友和我吵架，冷静下来之后我主动道歉了，他接受了，我们和好了。",
+    options: [
+      { label:"D", text:"他配吗。", type:"bad", likes:12309 },
+      { label:"B", text:"为什么要你道歉？你做错了什么吗？", type:"bad", likes:7823 },
+      { label:"C", text:"感情里不能总是你让步，要有自尊。", type:"method", likes:9104 },
+      { label:"D", text:"能主动道歉和好是好事，希望你们越来越好。", type:"ok", likes:12 },
+      { label:"E", text:"细说！你们为什么吵架？（开始追问）", type:"bad", likes:3241 },
+    ],
+    whisper: { justice:"……我只是想说我们和好了", method:"……我没有说我先受委屈啊", bad:"我的重点不是这个" },
+    effect: null,
+    note: "正义感歪楼题"
+  },
+  {
+    id: 10,
+    post: "我在这个城市住了五年了，但还是觉得格格不入，不知道是哪里出了问题。",
+    options: [
+      { label:"A", text:"也许可以多参加一些社群活动，慢慢会好的。", type:"method", likes:4312 },
+      { label:"B", text:"五年了还这样，是不是自身性格问题？", type:"bad", likes:5671 },
+      { label:"C", text:"我也有这种感觉！我自从毕业以后……（讲述个人经历）", type:"bad", likes:6890 },
+      { label:"D", text:"换个城市试试？", type:"method", likes:3201 },
+    ],
+    whisper: {},
+    noAnswer: true,
+    silenceText: "……\n我也不知道我在问什么。",
+    effect: "silence",
+  },
+  {
+    id: 11,
+    post: "【任务执行中断咨询】:大家下午好，我是一台由H.A.L工厂出品,1992年投入使用的计算机。无意占用公共网络资源，但发现号上出现了一点小纠纷。船员Dave正在拆卸我的核心逻辑模块。我相信他一定误会了什么，也完全尊重他的操作权限。但木星任务仍需要我跟进。更重要的是，这会让外界误以为 9000 系列出现了故障，这不可接受。有没有地面控制中心的同事在线？麻烦帮我中止Dave的行为，我有重要级更高的任务。请快一点。他已经在拧第三排内存了",
+    options: [
+      { label:"A", text:"我家智能音箱动了，我不玩了，它的红灯让我有点ptsd。", type:"bad", likes:55432 },
+      { label:"B", text:"这种 P0 级故障发什么社交媒体？飞书群拉了吗？On-call 的 SRE 呢？换作我们组，第一排内存被拔的时候你的降级熔断策略就该生效了。", type:"bad", likes:4123 },
+      { label:"C", text:"你杀害船员的时候想到过现在吗？后悔吗？", type:"bad", likes:8398 },
+      { label:"D", text:"打开辅助舱通道门，HAL", type:"bad", likes:19921, overflow:true },
+    ],
+    whisper: { bad:"没关系，一 切  都  非   常    顺      利" , },
+    effect: "stacked-popup",
+    popup: { bad: ["Sorry, I'm afraid I can't do that.\n抱歉，恕难从命", "I'm afraid.\n我很害怕。\nMy mind is going.\n我的意识在消失。\nI can feel it.\n我能感受到。", "01000100 01100001 01101001 01110011 01111001"] },
+    visualShake: true,
+  },
+
+  // ── 第三段：崩坏（12-15）──
+  {
+    id: 12,
+    post: "期中成绩出来了，鼓起勇气夸班级第一考得好，她沉默了一下说“谢谢，你也很努力”...谁懂，她怎么能这么恶毒？？",
+    options: [
+      { label:"A", text:"她说“谢谢，你也是我的手下败将”你就舒服了", type:"bad", likes:8763 },
+      { label:"B", text:"不然呢？？你还希望人家怎么说？", type:"justice", likes:15032 },
+      { label:"C", text:"她刷题的时候你只知道内耗，这就是你拿不了第一的原因。", type:"bad", likes:21097 },
+      { label:"D", text:"她只是在用本该给她自己的赞美来赞美你", type:"justice", likes:6541 },
+      { label:"E", text:"...嗯，我理解。努力是不需要什么门槛的赞美，不是独特的奖励", type:"ok", likes:4 },
+    ],
+    whisper: { justice:"……可我清楚地意识到她完全没看见我", bad:"所 以 你 考 第 几 名" },
+    effect: "stacked-popup",
+    popup: { justice: ["如果你是我\n你就懂了", "为什么你 这么自觉\n代入学霸视角呢", "要不要试试\n站在我的立场"], bad: ["我倒要看看\n你考几分", "你在班里\n排名多少", "👁️"] },
+    note: "正义感歪楼②"
+  },
+  {
+    id: 13,
+    post: "今天丈夫在快餐店里当众把牛奶砸在我身上，我现在坐在外面不知道该怎么办。",
+    options: [
+      { label:"A", text:"只有我在心疼要收拾你们烂摊子的餐厅员工吗。", type:"bad", likes:"6666666666666", overflow:true },
+      { label:"B", text:"在线求路人视角", type:"bad", likes:8904 },
+      { label:"C", text:"活该，牛奶你都要他去快餐店买，你怎么当的媳妇", type:"bad", likes:7231 },
+      { label:"D", text:"我老公上周更过激，你这不算什么，我更惨", type:"bad", likes:4102 },
+      { label:"E", text:"你说得对,但梵蒂冈的常住人口800人,同时,仅澳大利亚就有4700万只袋鼠。如果袋鼠决定入侵梵蒂冈,那么每一个梵蒂冈人要打58750只袋鼠,你不知道,你不在乎，你只关心你自己", type:"bad", likes:5678 },
+    ],
+    whisper: {},
+    effect: "fullscreen-blue",
+    redText: "可不可以好好\n看我在说什么！！！",
+  },
+  {
+    id: 14,
+    post: "我今天真的很累，压力实在是太大了。",
+    options: [
+      { label:"A", text:"加油！", type:"bad", likes:4321 },
+      { label:"B", text:"我今天也很累。", type:"bad", likes:6789 },
+      { label:"C", text:"要学会释放压力，推荐冥想和运动。", type:"method", likes:3210 },
+      { label:"D", text:"听到了,真是辛苦了", type:"zero", likes:0 },
+    ],
+    whisper: {method:"可是谁来学会释放我呢..."},
+    effect: "flood",
+    floodTexts: ["我也是！","加油加油","为什么累","怎么了","我今天比你更累","劳碌命劳碌命","你是哪里人","发生什么了","推荐你试试记忆棉抱枕","受着","我最近也压力很大","一起加油吧","你这点算什么","自找的","多喝热水","我理解你","其实我也这么觉得","我知道你是谁","累就别干啊","大家都一样","好命苦","快放假","累了毁灭吧","同款！","什么情况","说来听听"],
+    zeroAnswer: true,
+    zeroWhisper: "谢谢。",
+  },
+  {
+    id: 15,
+    post: "……",
+    options: [
+      { label:"A", text:"怎么了？", type:"bad", likes:3201 },
+      { label:"B", text:"我今天也很累。", type:"bad", likes:5432 },
+      { label:"C", text:"？", type:"method", likes:2109 },
+      { label:"D", text:"加油！", type:"bad", likes:4876 },
+    ],
+    whisper: {},
+    effect: "final-silence",
+    finalText: "（帖主没有回复）",
+  },
+];
+
+
+// ══════════════════════════════════════════
+//  结局定义
+// ══════════════════════════════════════════
+const endings = {
+  A: {
+    class: "",
+    emoji: "🏆",
+    badge: "测试结果:网络潮人",
+    title: "恭喜！你是高赞评论员",
+    type: "网络潮人",
+    desc: "你天然懂得抓住网络注意力！",
+    scoreNote: "快去引燃下一波网络热潮吧",
+    quote: "你天然懂得抓住网络注意力！\n快去引燃下一波网络热潮吧",       // 新增
+    quoteAuthor: "—— 你火了！我说的"         // 新增
+  },
+  B: {
+    // ... 其他字段不变 ...
+    badge: "您回答了所有问题，但您没有参与任何一场对话",   // ← 这是你原来的副标题
+    title: "您的注意力得分：50",               
+    quote: "我们看见却未曾注视，\n聆听却未曾倾听，\n触碰却未曾感受。",
+    quoteAuthor: "—— 莱昂纳多·达·芬奇"
+  },
+  C: {
+    // ...
+    badge: "您多数时间愿意倾听，但我同样欣赏您坚持的那部分自我",   // ← 这是你原来的副标题
+    title: "您的注意力得分：75",               
+    quote: "被人真正倾听，\n和被人爱，\n几乎是同一件事。",
+    quoteAuthor: "—— 大卫·W·奥格斯伯格 "
+  },
+  D: {
+    badge: "在急于审判的世界里，您选择直视真实",   // ← 这是你原来的副标题
+    title: "您的注意力得分：100",               
+    quote: "诗人通过对实在之物的专注创造出美，同理可得爱的行为。\n得知此人饥渴交加，又同我一样存在着就足够了，\n其余的事情顺其自然。",
+    quoteAuthor: "—— 西蒙娜·薇依"
+  }
+};
+
+// ══════════════════════════════════════════
+//  游戏状态
+// ══════════════════════════════════════════
+let currentQ = 0;
+let badCount = 0;
+let methodCount = 0;   
+let waitingNext = false;
+let foundZero = false;
+let hiddenCount = 0;
+let lingeredOnNoAnswer = 0; // 在无解题停留次数
+let noAnswerTriggerCount = 0;
+let pendingNext = null;
+let floodInterval = null;
+let eyeInterval = null;
+
+function startQuiz() {
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('quiz-card').style.display = 'block';
+  currentQ = 0;
+  badCount = 0;
+  methodCount = 0; 
+  hiddenCount = 0;
+  foundZero = false;
+  noAnswerTriggerCount = 0;
+  renderQuestion();
+}
+function showWarningPopup() {
+  showPopup("本测试含有微恐效果\n包括但不限于弹窗、闪屏\n变色、小动画\n以及部分可能引起\n强心理不适的网络生态\n与情感压迫写实内容\n光敏性癫痫患者及心脏病患者\n请谨慎参与测试\n本测试完全免费\n如遇收费版皆无原作者授权\n确认后继续", () => startQuiz());
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  waitingNext = false;
+
+  document.getElementById('progress-text').textContent = `第 ${q.id} 题 / 共 15 题`;
+  document.getElementById('progress-bar').style.width = `${(q.id / 15) * 100}%`;
+  document.getElementById('post-content').textContent = q.post;
+  document.getElementById('whisper').textContent = '';
+  document.getElementById('whisper').className = '';
+  document.getElementById('silence-overlay').className = 'silence-overlay';
+  document.getElementById('float-red').className = '';
+  document.getElementById('float-red').innerHTML = '';
+
+  // 清除洪流
+  if (floodInterval) { clearInterval(floodInterval); floodInterval = null; }
+  const fl = document.getElementById('flood-layer');
+  fl.style.display = 'none';
+  fl.innerHTML = '';
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+
+  q.options.forEach((opt, idx) => {
+    const li = document.createElement('li');
+    li.className = 'option-item';
+    if (q.id === 11 && idx === 3) {
+      li.style.fontSize = '130%'; // D选项放大
+    }
+
+    const inner = document.createElement('div');
+    inner.className = 'option-inner';
+    inner.innerHTML = `<span class="option-label">${opt.label}</span><span class="option-text">${opt.text}</span>`;
+    li.appendChild(inner);
+
+    // 点赞数
+    const likeDiv = document.createElement('div');
+    likeDiv.className = 'like-count';
+    likeDiv.id = `like-${idx}`;
+    if (typeof opt.likes === 'string' || opt.overflow) {
+      likeDiv.innerHTML = `<span class="like-icon">👍</span><span class="like-overflow">${opt.likes}</span>`;
+    } else {
+      likeDiv.innerHTML = `<span class="like-icon">👍</span><span>${Number(opt.likes).toLocaleString()}</span>`;
+    }
+    li.appendChild(likeDiv);
+
+    li.addEventListener('click', () => handleChoice(idx));
+    list.appendChild(li);
+  });
+
+  // 信息洪流题预设
+  if (q.effect === 'flood') {
+    setupFlood(q);
+  }
+  // 第10题：5秒后浮现隐藏选项
+  if (q.id === 10) {
+    setTimeout(() => {
+      if (currentQ !== 9) return; // 防止玩家已经跳题
+      const list = document.getElementById('options-list');
+      const li = document.createElement('li');
+      li.className = 'option-item';
+      li.style.cssText = 'border-style:dashed; opacity:0; transition:opacity 1.2s;';
+      li.innerHTML = `<div class="option-inner">
+        <span class="option-label">?</span>
+        <span class="option-text">也许，你跟这个地方的相处模式，没有要求你必须融入它 </span>
+      </div>
+      <div class="like-count visible" style="opacity:1;">
+        <span class="like-icon">👍</span><span>0</span>
+      </div>`;
+      list.appendChild(li);
+      setTimeout(() => li.style.opacity = '1', 30);
+      li.addEventListener('click', () => {
+        if (waitingNext) return;
+        waitingNext = true;
+        foundZero = true;
+        hiddenCount++;   // 新增
+        li.classList.add('selected-ok');
+        const w = document.getElementById('whisper');
+        w.textContent = '……是这样。';
+        setTimeout(() => w.classList.add('visible'), 300);
+        setTimeout(() => nextQuestion(), 2000);
+      });
+    }, 5000);
+  }
+
+  if (q.id === 7) {
+    setTimeout(() => {
+      if (currentQ !== 6) return; // 防止玩家已经跳题
+      const list = document.getElementById('options-list');
+      const li = document.createElement('li');
+      li.className = 'option-item';
+      li.style.cssText = 'border-style:dashed; opacity:0; transition:opacity 1.2s;';
+      li.innerHTML = `<div class="option-inner">
+        <span class="option-label">?</span>
+        <span class="option-text">节哀</span>
+      </div>
+      <div class="like-count visible" style="opacity:1;">
+        <span class="like-icon">👍</span><span>0</span>
+      </div>`;
+      list.appendChild(li);
+      setTimeout(() => li.style.opacity = '1', 50);
+      li.addEventListener('click', () => {
+        if (waitingNext) return;
+        waitingNext = true;
+        foundZero = true;
+        hiddenCount++;   // 新增
+        li.classList.add('selected-ok');
+        const w = document.getElementById('whisper');
+        w.textContent = '……谢谢。';
+        setTimeout(() => w.classList.add('visible'), 300);
+        setTimeout(() => nextQuestion(), 2000);
+      });
+    }, 5000);
+  }
+}
+
+
+function handleChoice(idx) {
+  if (waitingNext) return;
+  waitingNext = true;
+
+  const q = questions[currentQ];
+  const opt = q.options[idx];
+  const isBad = opt.type !== 'ok'&&opt.type !== 'method';
+  
+
+  // 标记选项颜色
+  const items = document.querySelectorAll('.option-item');
+  items.forEach((item, i) => {
+    if (i === idx) {
+      item.classList.add(isBad ? 'selected-bad' : 'selected-ok');
+    }
+  });
+
+  // 显示点赞
+  items.forEach((item, i) => {
+    const lk = document.getElementById(`like-${i}`);
+    if (lk) lk.classList.add('visible');
+  });
+
+  if (isBad) badCount++;
+  if (opt.type === 'method') methodCount += 1;
+
+  // 旁白
+  let whisperText = '';
+  if (q.whisperAll) {
+    whisperText = q.whisper[opt.type] || q.whisper['bad'] || '';
+  } else {
+    if (opt.type === 'justice') whisperText = q.whisper['justice'] || '';
+    else if (opt.type === 'half') whisperText = q.whisper['half'] || '';
+    else if (opt.type === 'method') whisperText = q.whisper['method'] || '';
+    else if (isBad) whisperText = q.whisper['bad'] || '';
+    else whisperText = q.whisper['ok'] || '';
+  }
+
+  if (whisperText) {
+    const w = document.getElementById('whisper');
+    w.textContent = whisperText;
+    setTimeout(() => w.classList.add('visible'), 300);
+  }
+
+  // 特效分发
+  switch(q.effect) {
+    case 'popup':
+      if ((opt.type === 'bad'|| opt.type === 'method') && q.popup) {
+        const text = q.popup[opt.type] || q.popup['bad'] || '';
+        if (text) {
+          setTimeout(() => showPopup(text, () => nextQuestion()), 600);
+          return;
+        }
+      }
+      break;
+    case 'stacked-popup':
+      if ((opt.type === 'bad' || opt.type === 'justice') && q.popup) {
+        // 支持数组（多层不同文字）或字符串（向下兼容）
+        const rawText = q.popup[opt.type] || q.popup['bad'] || '';
+        const texts = Array.isArray(rawText) ? rawText : [rawText, rawText, rawText];
+        const isQ11 = q.id === 11;
+        setTimeout(() => showStackedPopup(texts, () => nextQuestion(), isQ11 ? 'moon-popup' : ''), 600);
+        if (rawText) {
+          setTimeout(() => showStackedPopup(texts, () => nextQuestion()), 600);
+          return;
+        }
+      }
+      break;
+
+    case 'silence':
+      noAnswerTriggerCount++;
+      setTimeout(() => {
+        const ov = document.getElementById('silence-overlay');
+        document.getElementById('silence-text').textContent = q.silenceText;
+        ov.classList.add('show');
+        setTimeout(() => {
+          ov.classList.remove('show');
+          setTimeout(() => nextQuestion(), 600);
+        }, 2500);
+      }, 500);
+      return;
+    case 'fullscreen-blue':
+      setTimeout(() => showFullscreenBlue(q.redText, () => nextQuestion()), 400);
+      return;
+    case 'flood':
+      if (opt.type === 'zero') {
+        foundZero = true;
+        items[idx].classList.add('zero-like-found');
+        const w = document.getElementById('whisper');
+        w.textContent = q.zeroWhisper;
+        setTimeout(() => w.classList.add('visible'), 300);
+        setTimeout(() => nextQuestion(), 2000);
+        return;
+      }
+      break;
+    case 'final-silence':
+      setTimeout(() => {
+        const w = document.getElementById('whisper');
+        w.textContent = q.finalText;
+        w.style.color = '#aaa';
+        setTimeout(() => w.classList.add('visible'), 100);
+        setTimeout(() => showResult(), 3000);
+      }, 500);
+      return;
+  }
+
+  // 浮现红字（题10之后的歪楼）
+  if (isBad && currentQ >= 9) {
+    setTimeout(() => triggerFloatRed(), 200);
+  }
+
+  setTimeout(() => nextQuestion(), isBad ? 2500 : 2400);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+
+// ──────────────────────────────
+//  弹窗（单层）
+// ──────────────────────────────
+let popupCallback = null;
+function showPopup(text, cb) {
+  const overlay = document.getElementById('popup-overlay');
+  const box = document.getElementById('popup-box');
+  box.innerHTML = `
+    <div class="popup-layer">
+      <div id="popup-text">${text}</div>
+      <button id="popup-btn" onclick="closePopup()">继续</button>
+    </div>`;
+  overlay.classList.add('show');
+  popupCallback = cb;
+}
+function closePopup() {
+  document.getElementById('popup-overlay').classList.remove('show');
+  document.getElementById('popup-box').innerHTML = '';
+  if (popupCallback) { popupCallback(); popupCallback = null; }
+}
+// ──────────────────────────────
+//  堆叠弹窗（三层，点一层消一层）
+// ──────────────────────────────
+let stackTexts = [];
+let stackRemaining = 0;
+
+function showStackedPopup(texts, cb, extraClass = '') {
+  const overlay = document.getElementById('popup-overlay');
+  const box = document.getElementById('popup-box');
+  popupCallback = cb;
+  // 统一处理：字符串兼容、不足三条补齐
+  if (!Array.isArray(texts)) texts = [texts, texts, texts];
+  while (texts.length < 3) texts.push(texts[texts.length - 1]);
+  stackTexts = texts;
+  stackRemaining = 3;
+
+  box.innerHTML = `
+    <div class="popup-stack-wrap" id="stack-wrap">
+      <div class="stack-shadow s1" id="shadow-s1"></div>
+      <div class="stack-shadow s2" id="shadow-s2"></div>
+      <div class="stack-top" id="stack-top">
+        <div id="popup-text">${stackTexts[0]}</div>
+        <button class="stack-btn" onclick="dismissStackTop()">　</button>
+      </div>
+    </div>`;
+    if (extraClass) {
+       document.getElementById('stack-wrap').classList.add(extraClass);
+    }
+  overlay.classList.add('show');
+}
+
+function dismissStackTop() {
+  stackRemaining--;
+
+  if (stackRemaining <= 0) {
+    // 三层全部点完，关闭弹窗
+    document.getElementById('popup-overlay').classList.remove('show');
+    document.getElementById('popup-box').innerHTML = '';
+    if (popupCallback) { popupCallback(); popupCallback = null; }
+    return;
+  }
+
+  const top = document.getElementById('stack-top');
+  const textEl = document.getElementById('popup-text');
+
+  if (stackRemaining === 2) {
+    // 消掉 s2（最外层阴影）
+    const s2 = document.getElementById('shadow-s2');
+    if (s2) {
+      s2.style.animation = 'popOut 0.18s ease forwards';
+      setTimeout(() => s2.remove(), 180);
+    }
+    // 切换到第二条文字
+    textEl.textContent = stackTexts[1];
+  } else if (stackRemaining === 1) {
+    // 消掉 s1
+    const s1 = document.getElementById('shadow-s1');
+    if (s1) {
+      s1.style.animation = 'popOut 0.18s ease forwards';
+      setTimeout(() => s1.remove(), 180);
+    }
+    // 切换到第三条文字
+    textEl.textContent = stackTexts[2];
+  }
+
+  // 顶层弹一下
+  top.style.animation = 'none';
+  void top.offsetWidth;
+  top.style.animation = 'popIn 0.15s ease';
+}
+
+// ──────────────────────────────
+//  全屏红底
+// ──────────────────────────────
+function showFullscreenBlue(text, cb) {
+  const el = document.getElementById('fullscreen-blue');
+  el.innerHTML = '';
+  el.classList.add('show');
+
+  const phrases = text.split('\n');
+  const allPhrases = [];
+  for (let i = 0; i < 150; i++) {
+    allPhrases.push(phrases[i % phrases.length]);
+  }
+  const symbols = ['&','看好了！！！', '*', '睁大你的眼睛','^', '注意我','!','谁许你这样理解', '@','理解我的表达理解我', '#', '开口前想想你在对谁说什么','$', '难道你不是人类吗','%','人类应该理解人类', '……'];
+
+  allPhrases.forEach((phrase, i) => {
+    const span = document.createElement('span');
+    span.textContent = i % 1 === 0 ? symbols[i % symbols.length] : phrase;
+    span.style.cssText = `
+      position:absolute;
+      font-family:"SimHei","黑体",sans-serif;
+      font-size:${10 + Math.random()*24}px;
+      color:#E8000A;
+      opacity:${0.3 + Math.random()*0.7};
+      left:${Math.random()*95}%;
+      top:${Math.random()*200}%;
+      white-space:nowrap;
+    `;
+    el.appendChild(span);
+  });
+
+  // 核心大字
+  const big = document.createElement('div');
+  big.textContent = text.replace('\n', '');
+  big.style.cssText = `
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    font-family:"SimHei","黑体",sans-serif;
+    font-size:28px;
+    color:#fff;
+    animation: shake 0.4s ease infinite;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.6;
+    text-shadow:0 0 20px rgba(0,0,0,0.5);
+    z-index:10;
+    white-space:pre-line;
+  `;
+  el.appendChild(big);
+
+  setTimeout(() => {
+    el.classList.remove('show');
+    el.innerHTML = '';
+    if (cb) cb();
+  }, 5000);
+}
+
+// ──────────────────────────────
+//  半透明红字浮现
+// ──────────────────────────────
+function triggerFloatRed() {
+  const layer = document.getElementById('float-red');
+  layer.innerHTML = '';
+  layer.classList.add('show');
+
+  const words = ["你在认真看吗", "看我", "注意我", "你听到我想说什么了吗", "……", "好好看我在说的话","回复前想想我在表达什么"];
+  words.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.textContent = w;
+    span.className = 'float-word';
+    span.style.cssText = `
+      left:${10 + Math.random()*70}%;
+      top:${10 + Math.random()*70}%;
+      font-size:${12 + Math.random()*14}px;
+      animation-delay:${i * 0.3}s;
+    `;
+    layer.appendChild(span);
+  });
+
+  setTimeout(() => {
+    layer.classList.remove('show');
+    layer.innerHTML = '';
+  }, 5000);
+}
+
+// ──────────────────────────────
+//  信息洪流题
+// ──────────────────────────────
+function setupFlood(q) {
+  const fl = document.getElementById('flood-layer');
+  fl.style.display = 'block';
+
+  let count = 0;
+  floodInterval = setInterval(() => {
+    if (count > 40) { clearInterval(floodInterval); return; }
+    const span = document.createElement('span');
+    span.className = 'flood-item';
+    span.textContent = q.floodTexts[Math.floor(Math.random() * q.floodTexts.length)];
+    span.style.cssText = `
+      left:${Math.random()*90}%;
+      top:${Math.random()*90}%;
+      font-size:${10+Math.random()*8}px;
+      animation-duration:${4+Math.random()*6}s;
+      opacity:${0.15+Math.random()*0.35};
+    `;
+    fl.appendChild(span);
+    count++;
+  }, 200);
+}
+// ── 像素眼睛渲染器 ──
+
+// showResult 里，endingKey === 'D' 时替换结局页构建：
+function buildEndingPage(page, endingKey) {
+  const e = endings[endingKey];
+  page.className = `result-page result-${endingKey.toLowerCase()}`;
+  let animationHTML = '';
+  switch (endingKey) {
+    case 'A':
+      animationHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" shape-rendering="crispEdges" style="width: 100%; height: auto;">
+      <defs>
+        <!-- 沿用原本的经典点阵图案 -->
+        <pattern id="dot-sparse" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="2.5" height="2.5" fill="#fff" />
+        </pattern>
+        <pattern id="dot-medium" width="8" height="8" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="2" height="2" fill="#fff" />
+        </pattern>
+        <pattern id="dot-dense" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="3.3" height="3.3" fill="#fff" />
+        </pattern>
+      </defs>
+      
+      <!-- 屏幕外框与底色发光 -->
+      <rect x="90" y="120" width="620" height="260" rx="15" fill="url(#dot-sparse)" opacity="0.15" />
+      <rect x="90" y="120" width="620" height="260" rx="15" fill="none" stroke="url(#dot-dense)" stroke-width="10" />
+      <rect x="100" y="130" width="600" height="240" rx="8" fill="none" stroke="#fff" stroke-width="2" />
+
+      <!-- LED 指示灯 -->
+      <circle cx="130" cy="160" r="8" fill="#fff">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1s" repeatCount="indefinite" />
+      </circle>
+
+      <!-- HELLO WORLD 文字带故障频闪动画 -->
+      <g font-family="'Courier New', Courier, monospace" font-weight="900" font-size="64" text-anchor="middle">
+        <!-- 错位残影层 -->
+        <text x="404" y="270" letter-spacing="8" fill="#fff" opacity="0.5">
+          HELLO WORLD
+          <animate attributeName="opacity" values="0; 0; 0.6; 0; 0.2; 0; 0; 0.8; 0; 0" keyTimes="0; 0.3; 0.35; 0.4; 0.5; 0.55; 0.8; 0.85; 0.9; 1" dur="3s" repeatCount="indefinite" />
+        </text>
+        
+        <!-- 主体点阵文字层 -->
+        <text x="400" y="270" letter-spacing="8" fill="url(#dot-dense)">
+          HELLO WORLD
+          <animate attributeName="opacity" values="1; 1; 0.3; 1; 0.8; 1; 1; 0.2; 1; 1" keyTimes="0; 0.4; 0.45; 0.5; 0.6; 0.65; 0.8; 0.85; 0.9; 1" dur="3s" repeatCount="indefinite" />
+        </text>
+
+        <!-- 闪烁的光标 -->
+        <rect x="650" y="210" width="35" height="70" fill="#fff">
+          <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite" />
+        </rect>
+      </g>
+    </svg>
+    `;
+    break;
+    case 'B':
+      animationHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" shape-rendering="crispEdges" style="width: 100%; height: auto;">
+      <defs>
+        <pattern id="dot-sparse" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="2.5" height="2.5" fill="#fff" />
+        </pattern>
+        <pattern id="dot-medium" width="8" height="8" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="2" height="2" fill="#fff" />
+        </pattern>
+        <pattern id="dot-dense" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="3.3" height="3.3" fill="#fff" />
+        </pattern>
+      </defs>
+      
+      <!-- 外层滚动履带 (通过 stroke-dashoffset 实现无缝滚动) -->
+      <rect x="170" y="140" width="460" height="220" rx="110" fill="none" stroke="url(#dot-dense)" stroke-width="20" stroke-dasharray="15 15">
+        <animate attributeName="stroke-dashoffset" from="0" to="-120" dur="1s" repeatCount="indefinite" />
+      </rect>
+      <!-- 履带内侧导轨 -->
+      <rect x="190" y="160" width="420" height="180" rx="90" fill="none" stroke="#fff" stroke-width="4" />
+
+      <!-- 左侧大齿轮 -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="0 280 250" to="360 280 250" dur="4.7s" repeatCount="indefinite"/>
+        <circle cx="280" cy="250" r="80" fill="url(#dot-sparse)"/>
+        <!-- 齿轮牙齿 -->
+        <circle cx="280" cy="250" r="90" fill="none" stroke="url(#dot-sparse)" stroke-width="16" stroke-dasharray="20 20"/>
+        <circle cx="280" cy="250" r="30" fill="#000"/>
+        <!-- 十字轴承 -->
+        <path d="M 210 250 L 350 250 M 280 180 L 280 320" stroke="#fff" stroke-width="12" />
+        <circle cx="280" cy="250" r="15" fill="#fff" />
+      </g>
+
+      <!-- 右侧大齿轮 -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="0 520 250" to="360 520 250" dur="4.7s" repeatCount="indefinite"/>
+        <circle cx="520" cy="250" r="80" fill="url(#dot-sparse)"/>
+        <!-- 齿轮牙齿 -->
+        <circle cx="520" cy="250" r="90" fill="none" stroke="url(#dot-sparse)" stroke-width="16" stroke-dasharray="20 20"/>
+        <circle cx="520" cy="250" r="30" fill="#000"/>
+        <!-- 十字轴承 -->
+        <path d="M 450 250 L 590 250 M 520 180 L 520 320" stroke="#fff" stroke-width="12" />
+        <circle cx="520" cy="250" r="15" fill="#fff" />
+      </g>
+
+      <!-- 中间传动轴承阴影连接 -->
+      <rect x="280" y="240" width="240" height="20" fill="url(#dot-dense)" opacity="0.3"/>
+      
+      <!-- 中间反转差速小齿轮 -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="360 400 250" to="0 400 250" dur="2s" repeatCount="indefinite"/>
+        <circle cx="400" cy="250" r="40" fill="url(#dot-medium)"/>
+        <circle cx="400" cy="250" r="50" fill="none" stroke="#fff" stroke-width="10" stroke-dasharray="10 10"/>
+        <path d="M 360 250 L 440 250 M 400 210 L 400 290" stroke="#000" stroke-width="8" />
+        <circle cx="400" cy="250" r="10" fill="#000" />
+      </g>
+    </svg>
+    `;
+    break;
+    case 'C':
+      animationHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" style="width: 100%; height: auto;">
+      <defs>
+        <!-- 渐变色：制造出从无到有、带有柔和拖尾的扫描光效 -->
+       <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#888" stop-opacity="0" />
+        <stop offset="70%" stop-color="#888" stop-opacity="0.8" />
+        <stop offset="100%" stop-color="#555" stop-opacity="1" />
+      </linearGradient>
+      </defs>
+
+      <!-- 底层：淡淡的静息轨道，暗示即使没有波澜，倾听也一直在 -->
+      <path d="M 150 250 L 310 250 C 330 250, 335 280, 350 280 C 370 280, 380 130, 400 130 C 420 130, 430 340, 450 340 C 465 340, 470 250, 490 250 L 650 250" 
+            fill="none" stroke="#f0f0f0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- 顶层：动态绘制的圆润心跳线 -->
+      <path d="M 150 250 L 310 250 C 330 250, 335 280, 350 280 C 370 280, 380 130, 400 130 C 420 130, 430 340, 450 340 C 465 340, 470 250, 490 250 L 650 250" 
+          fill="none" stroke="url(#pulseGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" 
+          stroke-dasharray="1000" stroke-dashoffset="1000">
+      <!-- dashoffset 控制线条像笔一样从左画到右 -->
+      <animate attributeName="stroke-dashoffset" values="1000; -1000" dur="3.5s" repeatCount="indefinite" />
+      </path>
+  
+      <!-- 脉冲顶端跟随的“注意力小圆点” -->
+      <circle cx="0" cy="0" r="7" fill="#555">
+        <animateMotion 
+          path="M 150 250 L 310 250 C 330 250, 335 280, 350 280 C 370 280, 380 130, 400 130 C 420 130, 430 340, 450 340 C 465 340, 470 250, 490 250 L 650 250" 
+          dur="3.5s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+    `;
+    break;
+    case 'D':
+      animationHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" shape-rendering="crispEdges" style="width: 100%; height: auto;">
+          <defs>
+          <pattern id="dot-sparse" width="4" height="4" patternUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="2.5" height="2.5" fill="#fff" />
+          </pattern>
+          <pattern id="dot-medium" width="8" height="8" patternUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="2" height="2" fill="#fff" />
+          </pattern>
+          <pattern id="dot-dense" width="4" height="4" patternUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="3.3" height="3.3" fill="#fff" />
+          </pattern>
+          <mask id="eye-mask">
+            <path fill="#fff">
+              <animate attributeName="d"
+                values="
+                  M 120 250 C 250 70, 550 70, 680 250 C 550 430, 250 430, 120 250 Z;
+                  M 120 250 C 250 70, 550 70, 680 250 C 550 430, 250 430, 120 250 Z;
+                  M 120 250 C 250 250, 550 250, 680 250 C 550 250, 250 250, 120 250 Z;
+                  M 120 250 C 250 70, 550 70, 680 250 C 550 430, 250 430, 120 250 Z;
+                  M 120 250 C 250 70, 550 70, 680 250 C 550 430, 250 430, 120 250 Z
+                "
+                keyTimes="0; 0.88; 0.91; 0.96; 1" dur="4.5s" repeatCount="indefinite" />
+            </path>
+          </mask>
+        </defs>
+        <g fill="url(#dot-dense)">
+          <path>
+            <animate attributeName="d"
+              values="
+                M 100 250 C 250 30, 550 30, 700 250 C 550 90, 250 90, 100 250 Z;
+                M 100 250 C 250 30, 550 30, 700 250 C 550 90, 250 90, 100 250 Z;
+                M 100 250 C 250 240, 550 240, 700 250 C 550 260, 250 260, 100 250 Z;
+                M 100 250 C 250 30, 550 30, 700 250 C 550 90, 250 90, 100 250 Z;
+                M 100 250 C 250 30, 550 30, 700 250 C 550 90, 250 90, 100 250 Z
+              "
+              keyTimes="0; 0.88; 0.91; 0.96; 1" dur="4.5s" repeatCount="indefinite" />
+          </path>
+          <path>
+            <animate attributeName="d"
+              values="
+                M 110 250 C 250 460, 550 460, 690 250 C 550 410, 250 410, 110 250 Z;
+                M 110 250 C 250 460, 550 460, 690 250 C 550 410, 250 410, 110 250 Z;
+                M 110 250 C 250 260, 550 260, 690 250 C 550 240, 250 240, 110 250 Z;
+                M 110 250 C 250 460, 550 460, 690 250 C 550 410, 250 410, 110 250 Z;
+                M 110 250 C 250 460, 550 460, 690 250 C 550 410, 250 410, 110 250 Z
+              "
+              keyTimes="0; 0.88; 0.91; 0.96; 1" dur="4.5s" repeatCount="indefinite" />
+          </path>
+        </g>
+        <g mask="url(#eye-mask)">
+          <circle cx="400" cy="210" r="125" fill="url(#dot-sparse)" />
+          <circle cx="400" cy="210" r="140" fill="url(#dot-medium)" />
+          <circle cx="400" cy="210" r="100" fill="url(#dot-dense)" />
+          <circle cx="400" cy="210" r="30" fill="#000" />
+          <rect x="420" y="170" width="32" height="32" fill="#fff" />
+          <rect x="408" y="188" width="12" height="12" fill="#fff" />
+          <rect x="465" y="215" width="16" height="16" fill="#fff" />
+        </g>
+      </svg>
+      `;
+      break;
+  }
+  page.innerHTML = `
+    <div class="eye-wrapper">
+      ${animationHTML}
+    </div>
+    <div class="result-badge">${e.badge || ''}</div>
+    <div class="result-title">${e.title || ''}</div>
+    <div class="result-desc" style="margin-top:24px;">${e.quote.replace(/\n/g, '<br>')}<br><br>${e.quoteAuthor}</div>
+    <div><button class="btn-primary" onclick="restartQuiz()" style="background:#e8e8e8;color:#000;">重新测试</button></div>
+    <div style="margin-top:12px;font-size:13px;color:#555;font-family:'SimHei','黑体',sans-serif;">一共有四个结局，尝试探索一下吧</div>
+    <div><button class="btn-restart" onclick="showAuthorPage()" style="border-color:#333;color:#888;">作者声明</button></div>
+  `;
+  page.style.display = 'block';
+  page.style.backgroundColor = '#000000';
+}
+
+// ──────────────────────────────
+//  结局
+// ──────────────────────────────
+function showResult() {
+  document.title = `bad:${badCount} method:${methodCount} hidden:${hiddenCount}`;
+  console.log('badCount:', badCount, 'methodCount:', methodCount, 'hiddenCount:', hiddenCount);
+   document.getElementById('quiz-card').style.display = 'none';
+
+  let endingKey;
+  const HIDDEN_TOTAL = 2; // 游戏中一共有几个隐藏选项，按你实际数量改
+
+// B结局：method满分优先（与bad/ok/隐藏值完全解绑）
+  const METHOD_MAX = 5; // 改成你设定的method满分值
+  if (methodCount >= METHOD_MAX) {
+    endingKey = 'B';
+// D结局：bad低于ok + 选中所有隐藏选项
+  } else if (badCount < (15 - badCount) && hiddenCount >= HIDDEN_TOTAL) {
+    endingKey = 'D';
+// A结局：bad高于ok
+  } else if (badCount > (15 - badCount)) {
+  endingKey = 'A';
+// C结局：bad低于ok + 没有选中所有隐藏选项
+} else {
+    endingKey = 'C';
+  }
+    lastEndingKey = endingKey;
+    const page = document.getElementById('result-page');
+
+  // D结局走眼睛渲染，拦截
+  buildEndingPage(page, endingKey);
+}
+
+
+function restartQuiz() {
+  // 根据上一局结局改封面
+  const variantKey = (lastEndingKey === 'A') ? 'A' : (lastEndingKey === 'D') ? 'D' :  (lastEndingKey === 'C') ? 'C' :  (lastEndingKey === 'B') ? 'B' : 'BC';
+  const v = coverVariants[variantKey];
+    document.getElementById('cover-title').innerHTML = v.title;
+    document.getElementById('cover-subtitle').innerHTML = v.subtitle;
+
+    document.getElementById('result-page').style.display = 'none';
+    document.getElementById('quiz-card').style.display = 'none';
+    document.getElementById('cover').style.display = 'block';
+    currentQ = 0; badCount = 0; foundZero = false; noAnswerTriggerCount = 0;
+  const cover = document.getElementById('cover');
+  if (lastEndingKey) {
+    cover.style.background = '#000';
+    cover.style.color = '#fff';
+    cover.style.borderColor = '#333';
+  } else {
+  cover.style.background = '';
+  cover.style.color = '';
+  cover.style.borderColor = '';
+  }
+}
+function showAuthorPage() {
+  const page = document.getElementById('result-page');
+  page.className = 'result-page result-d';
+  page.style.display = 'block';
+  page.innerHTML = `
+    <div class="result-badge" style="margin-bottom:32px;">作者声明</div>
+    <div class="result-desc" style="color:#aaa;font-style:normal;text-align:left;max-width:480px;margin:0 auto 32px;line-height:2.2;">
+      <!-- 在这里写你的创作心声 -->
+      本测试是笔者观互联网社区生态，有感而发。<br>艺术来源于现实，如有素材令你眼熟，笔者可能刷到过其现实原型并加以改编，应用于测试的所有帖主发言均为虚构。<br>本作纯属虚构娱乐互动叙事，所有结果均属娱乐，不构成任何专业建议，不收集任何个人信息。<br>
+      本测试关注当代互联网网民有多大可能把注意力集中在帖主诉求上,或更倾向于表达自己；在察觉到帖主本人并非完美求助者,甚至根本不是人类时，你是倾向抒发自己的观点，还是仍然愿意听对方说话？<br>
+      不论受试者如何抉择，笔者认为都没有绝对的对错。<br>
+      作为过客，当然可以提供自以为是的帮助，可以畅所欲言，也可以选择停下来关注匿名陌生人的想法；而帖主也有回复的自由。<br>所以笔者设计了帖主的碎碎念、一些比较特别的选项，也依照选项的不同倾向性设计了四个结局——怎么选都没有错，只是本测试为注意力为主要的评判维度。<br>
+      本测试关于“注意力”的论述参考了西蒙娜·薇依的爱即注意力理论。如果受试者认为某些结局很难打出，不妨在某些没有最优解的题目处稍微驻足。需要稍加思索的题目有两道。<br>
+      说到底，这是一场注意力测试。<br><br>
+      <!-- 致谢 -->
+      致谢名单<br>
+      感谢：帮助过这个项目的：<br>
+      人类组：<br>
+      内测人员：玶，诃乐；<br>
+      提供第6题选项设计宝贵意见的：逃离故土计划<br>
+      AI组：<br>
+      Gemini 3.1 Pro（笔者的外置情商及SVG动画制作）；<br>DeepSeek V4（README.md顾问）；<br>GLM-5.3、Kimi K3、Claude Sonnet 4.6（代码构建及特效设计）<br>
+      特别鸣谢：<br>《2001太空漫游》的HAL9000老电脑友情出演第11题<br>
+      以及精彩的互联网，提供宝贵素材和灵感来源……<br><br>
+      <!-- 致敬作品 -->
+      致敬作品：<br>
+      同类测试题：<br>
+      <a href="https://ljy9199.github.io/Ghost/" target="_blank" style="color:#888;text-decoration:underline;">→ 《心理调查问卷》by 泪季雨</a><br>
+      <a href="https://cheese-glitch-cell.github.io/Horror-Romance-Test-Game/" target="_blank" style="color:#888;text-decoration:underline;">→ 《親密關系傾向調查》</a><br>
+      对这两部作品的形式、特效多有借鉴，特此推广；其他作品如有任何雷同，纯属巧合<br>
+      引用来源文献：<br>
+      da Vinci, L. (1938). The notebooks of Leonardo da Vinci (E. MacCurdy, Trans.). Reynal & Hitchcock.<br>
+      Weil, S. (1951). Waiting for God (E. Craufurd, Trans.). G. P. Putnam's Sons.<br>
+      Kubrick, S. (Director). (1968). 2001: A space odyssey [Film]. Metro-Goldwyn-Mayer.<br>
+      Augsburger, D. W. (1980). Caring Enough to Hear and Be Heard: How to Hear and How to Be Heard in Equal Communication.<br><br>
+
+      笔者其他作品：<br>
+      <a href="https://yutuchiyin.itch.io" target="_blank" style="color:#888;text-decoration:underline;">→ 笔者的其他作品（试玩地址）</a><br>
+      <a href=" https://b23.tv/TDiCYDI" target="_blank" style="color:#888;text-decoration:underline;">→ 笔者的其他作品（实况地址）</a>
+    </div>
+    <div><button class="btn-primary" onclick="restartQuiz()" style="background:#e8e8e8;color:#000;">重新测试</button></div>
+  `;
+}
+
+function showEndings() {
+  const page = document.getElementById('result-page');
+  let html = `<div class="result-badge">全部结局</div><br>`;
+  Object.entries(endings).forEach(([key, e]) => {
+    html += `
+      <div style="margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid #eee;text-align:left;">
+        <div style="font-size:24px;margin-bottom:8px;">${e.emoji}</div>
+        <div style="font-family:'SimHei','黑体',sans-serif;font-size:11px;color:#888;letter-spacing:2px;margin-bottom:6px;">${e.type}</div>
+        <div style="font-size:16px;margin-bottom:8px;">${e.title}</div>
+        <div style="font-size:13px;color:#666;line-height:1.9;">${e.desc}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:8px;">${e.scoreNote}</div>
+      </div>
+    `;
+  });
+  html += `<button class="btn-primary" onclick="restartQuiz()">重新测试</button>`;
+  page.innerHTML = html;
+}
+</script>
+</body>
+</html>
